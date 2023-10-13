@@ -185,10 +185,17 @@ test('Forgot password edit email', async ({loginPage}) => {
   });
 });
 
-test('Click logo, go on main page', async ({loginPage}) => {
-  await test.step("Enter not existing mail and click next", async () => { 
+test('Click logo, go on main page', async ({loginPage, context}) => {
+  await test.step("Click logo, go on main page", async () => { 
     await loginPage.logo.getRawElement().click();
   });
+
+  await test.step("Home page is displayed", async () => { 
+    const pagePromise = context.waitForEvent('page', {timeout: 5});
+    const newPage = await pagePromise;
+    await newPage.waitForLoadState();
+    expect(newPage.url()).not.toEqual(loginPage.page.url())
+  });  
 });
 
 test('Erase cookies and refresh page', async ({loginPage}) => {
@@ -214,9 +221,7 @@ test('Cookies learn more button', async ({loginPage, context}) => {
   const pagePromise = context.waitForEvent('page');
 
   await test.step('Click on learn more button', async ()=> {  
-    // const pagePromise = context.waitForEvent('page');
     await loginPage.cookiesBanner.learnMoreLink.getRawElement().click();
-    // await loginPage.page.waitForURL(`**${privacyAndPolicy.PATH}`)
   });
 
   await test.step("Opened Privacy Policy page", async () => { 
